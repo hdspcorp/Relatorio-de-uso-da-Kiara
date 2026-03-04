@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatórios de Uso KIARA</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  /* Tom mais escuro e neutro (mais próximo do Workspace) */
+  --bg:#0b0b12;
+  --text:#e9e8ff;
+  --muted:#a4a6b9;
+
+  --stroke: rgba(255,255,255,.08);
+  --stroke2: rgba(255,255,255,.12);
+
+  --panel: rgba(255,255,255,.05);
+  --panel2: rgba(255,255,255,.03);
+
+  /* acentos bem discretos */
+  --a1:#7a5cff;
+  --a2:#ff7a59;
+
+  --radius:18px;
+  --radius2:14px;
+
+  --shadow: 0 24px 64px rgba(0,0,0,.55);
+  --shadow2: 0 16px 44px rgba(0,0,0,.45);
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+
+body{
+  margin:0;
+  color:var(--text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Arial, sans-serif;
+  font-size: 14px;                 /* compacta e deixa mais “app” */
+  background: var(--bg);           /* fundo base consistente */
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Fundo fixo (não “muda” ao rolar) */
+body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  /* Fundo mais “Workspace”: escuro com luz bem suave */
+  background:
+    radial-gradient(1200px 600px at 18% -10%, rgba(122,92,255,.10), transparent 60%),
+    radial-gradient(900px 520px at 88% -20%, rgba(255,122,89,.07), transparent 60%),
+    radial-gradient(900px 520px at 45% 30%, rgba(255,255,255,.04), transparent 60%),
+    var(--bg);
+}
+
+.container{
+  max-width: 1480px;         /* mais “dashboard” */
+  margin: 22px auto;         /* sobe a UI */
+  padding: 20px;             /* compacto */
+  border-radius: calc(var(--radius) + 4px);
+  border:1px solid var(--stroke);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom: 12px;
+}
+
+.title-block{ min-width: 260px; }
+
+h1{
+  margin:0;
+  font-family: Sora, Inter, system-ui, sans-serif;
+  font-size: 22px;          /* menor */
+  letter-spacing: .2px;
+}
+
+.small{
+  font-size: 12px;          /* menor */
+  color: var(--muted);
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.btn-group{
+  display:inline-flex;
+  gap:8px;
+  padding:6px;
+  border-radius: 16px;
+  border:1px solid rgba(255,255,255,.12);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+}
+
+/* padronização total */
+.btn-ghost{ display:none; }
+
+/* garante que "secondary" siga exatamente o mesmo padrão do resto */
+.btn.secondary{
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);
+  color: var(--text);
+}
+
+.file-status{
+  padding: 8px 10px;
+  border-radius: 14px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.18);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns: 0.95fr 1.35fr; /* dá mais espaço pros totais */
+  gap: 14px;
+  margin-top: 8px;          /* sobe os painéis */
+}
+
+.layout-top{ margin-top: 6px; }
+
+.panel{
+  border-radius: var(--radius);
+  border:1px solid var(--stroke);
+  background:
+    radial-gradient(800px 280px at 20% 0%, rgba(122,92,255,.12), transparent 60%),
+    radial-gradient(800px 280px at 90% 50%, rgba(255,122,89,.10), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  box-shadow: var(--shadow2);
+  padding: 16px;
+  min-height: 240px;
+  backdrop-filter: blur(10px);
+}
+
+.panel-title{
+  font-weight: 900;
+  letter-spacing: .2px;
+  margin-bottom: 8px;
+  font-family: Sora, Inter, system-ui, sans-serif;
+}
+
+.file-list{
+  list-style:none;
+  margin: 10px 0 0 0;
+  padding: 0;
+  max-height: 320px;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.file-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.08);
+  background: rgba(0,0,0,.18);
+}
+
+.file-item .title{
+  font-weight:800;
+  color: rgba(233,232,255,.95);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.file-item .meta{
+  font-size:12px;
+  color: var(--muted);
+  margin-top:2px;
+}
+
+.muted{ opacity:.75; color: var(--muted); }
+
+.totals-grid{
+  display:grid;
+  grid-template-columns: 1.2fr 1fr 1fr;  /* MAIS ORGANIZADO */
+  gap: 12px;
+  margin-top: 10px;
+  align-items: stretch;
+}
+
+.kpi{
+  border-radius: var(--radius2);
+  border:1px solid rgba(255,255,255,.12);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  padding: 14px;
+  min-height: 98px;
+}
+
+/* .kpi-primary removido: não destacamos mais este KPI */
+
+.kpi-label{
+  font-size: 12px;
+  color: rgba(236,235,255,.78);
+}
+
+.kpi-value{
+  font-size: 36px;
+  font-weight: 900;
+  margin-top: 6px;
+  letter-spacing: .3px;
+  font-family: Sora, Inter, system-ui, sans-serif;
+}
+
+.kpi-sub{
+  font-size: 12px;
+  color: rgba(236,235,255,.62);
+  margin-top: 4px;
+}
+
+.tops{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.top-card{
+  border-radius: var(--radius2);
+  border:1px solid rgba(255,255,255,.12);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  padding: 14px;
+}
+
+.top-title{
+  font-weight: 900;
+  font-size: 13px;
+  margin-bottom: 8px;
+  color: rgba(236,235,255,.92);
+  font-family: Sora, Inter, system-ui, sans-serif;
+}
+
+.top-list{
+  margin: 0 0 0 18px;
+  padding: 0;
+}
+.top-list li{
+  margin: 6px 0;
+  color: rgba(236,235,255,.84);
+}
+
+.overlay{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.62);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  display:none;
+  backdrop-filter: blur(2px);
+}
+
+.overlay-box{
+  width: min(560px, 92vw);
+  border-radius: 20px;
+  border:1px solid rgba(255,255,255,.14);
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
+  padding: 26px;
+  text-align:center;
+  box-shadow: 0 28px 90px rgba(0,0,0,.58);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+@media (max-width: 1100px){
+  .container{ margin: 22px 14px; }
+  .layout{ grid-template-columns: 1fr; }
+  .totals-grid{ grid-template-columns: 1fr; }
+  .tops{ grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="title-block">
+      <h1>Relatórios de Uso KIARA</h1>
+      <div class="small" id="periodLabel">Período: —</div>
+    </div>
+
+    <div class="header-actions" aria-label="Ações">
+      <button class="btn secondary" type="button"
+        onclick="document.getElementById('fileInput').click()">
+  Importar Json
+</button>
+
+      <div class="btn-group" role="group" aria-label="Relatórios">
+  <button class="btn secondary" type="button" onclick="exportUnified()">Unificado</button>
+  <button class="btn secondary" type="button" onclick="exportSeparate()">Separado</button>
+  <button class="btn secondary" type="button" onclick="exportDetailed()">Relatório para BI</button>
+</div>
+
+      <!-- status compacto (SEM listar nomes aqui) -->
+      <div class="file-status" id="fileName">0 arquivos</div>
+    </div>
+  </div>
+
+  <input type="file" id="fileInput" accept=".json" multiple hidden>
+
+  <div class="layout layout-top">
+    <div class="panel">
+      <div class="panel-title">Arquivos importados</div>
+      <div class="small">A lista abaixo reflete exatamente os JSONs carregados.</div>
+      <ul id="fileList" class="file-list">
+        <li class="muted">Nenhum arquivo importado.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Totais (sem exportar)</div>
+
+      <div class="totals-grid">
+        <div class="kpi">
+  <div class="kpi-label">Clientes distintos identificados</div>
+  <div class="kpi-value" id="totalsClientsIdentified">—</div>
+  <div class="kpi-sub">Clientes com código válido</div>
+</div>
+
+        <div class="kpi">
+          <div class="kpi-label">Totais de Clientes Distintos</div>
+          <div class="kpi-value" id="totalsClientsDistinct">—</div>
+          <div class="kpi-sub">Identificados + Não identificados</div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">Total de clientes Não identificados</div>
+          <div class="kpi-value" id="totalsClientsUnidentified">—</div>
+          <div class="kpi-sub">Clientes sem código detectável</div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">Quantidade total de conversas</div>
+          <div class="kpi-value" id="totalsConversations">—</div>
+          <div class="kpi-sub">Conversas com ≥1 interação válida</div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">Quantidade total de interações</div>
+          <div class="kpi-value" id="totalsInteractions">—</div>
+          <div class="kpi-sub">Pares válidos (user no período → assistant com score)</div>
+        </div>
+      </div>
+
+      <div class="tops">
+        <div class="top-card">
+          <div class="top-title">Top 5 dias (interações)</div>
+          <ol id="topDaysInteractions" class="top-list">
+            <li class="muted">—</li>
+          </ol>
+        </div>
+
+        <div class="top-card">
+          <div class="top-title">Top 5 dias (conversas)</div>
+          <ol id="topDaysConversations" class="top-list">
+            <li class="muted">—</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="small">
+        Considera apenas mensagens do cliente (role=user) cujo createdAt −3h esteja dentro do período do JSON
+        e que tenham resposta do assistente com score.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div id="overlayText">Processando...</div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   Relatórios de Uso KIARA — mesma lógica do Workspace (RAY)
+   + Painel de totais na tela (sem exportar)
+   ========================================================= */
+
+/* ======= Config de clientes (Google Sheets / Apps Script) =======
+   Se você já usa no Workspace, pode definir via window:
+   window.GOOGLE_SHEET_ID = '...';
+   window.GOOGLE_API_KEY  = '...';
+   window.GOOGLE_SHEET_RANGE = 'Clientes!A:C';
+   (A:C = Código | Nome | Unidade)
+*/
+let CLIENTS_INFO = null; // Map(code|norm) -> { name, unidade }
+let CLIENTS_MAP  = null; // Map(code|norm) -> name
+const GOOGLE_SHEET_ID    = window.GOOGLE_SHEET_ID    || '1JyckmObUPWGXy1-0jvBYWbPfQg6Owf6xjgG1Z2vWdZw';
+const GOOGLE_API_KEY     = window.GOOGLE_API_KEY     || '';
+const GOOGLE_SHEET_RANGE = window.GOOGLE_SHEET_RANGE || 'Clientes!A:C';
+
+/* Fallback opcional via Apps Script (se você já usa no Workspace, pode setar):
+   window.CLIENTS_API_URL = 'https://script.google.com/macros/s/.../exec';
+   Deve retornar algo como: { clientes:[{codigo,nome,unidade}, ...] }
+*/
+const CLIENTS_API_URL = window.CLIENTS_API_URL || '';
+
+/* Códigos especiais que devem aparecer como "Licença Interna" */
+const INTERNAL_LICENSE_CODES = new Set([
+  /* 1 */ '',
+  /* 2 */ '',
+  /* 3 */ '',
+  /* 4 */ '',
+  /* 5 */ '',
+  /* 6 */ '',
+  /* 7 */ '',
+  /* 8 */ '',
+  /* 9 */ '',
+  /* 10 */ ''
+]);
+
+/* ======= Estado de arquivos ======= */
+let RAY_FILES = [];         // [{name,data}]
+let __RAY_MERGED = null;     // {startDateStr,endDateStr,conversations}
+
+const overlay = document.getElementById("overlay");
+const overlayText = document.getElementById("overlayText");
+
+/* ======= Utils ======= */
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+function normCode(s){
+  const t = String(s||'').trim();
+  return t.replace(/^0+/, '');
+}
+function parseUserIdPart(uid){
+  const s = String(uid||'').trim();
+  const beforeDot = s.includes('.') ? s.split('.')[0] : s;
+  return /^\d+$/.test(beforeDot) ? beforeDot : '';
+}
+
+/* Converte createdAt para “epoch” representando o horário local (-03),
+   mas em base UTC (para facilitar hh:mm:ss com getUTCHours). */
+function createdAtLocalEpoch_RAY(createdAt){
+  const d = new Date(createdAt);
+  if (isNaN(d.getTime())) return NaN;
+  const local = new Date(d.getTime() - 3*60*60*1000);
+  return Date.UTC(
+    local.getFullYear(), local.getMonth(), local.getDate(),
+    local.getHours(), local.getMinutes(), local.getSeconds(), local.getMilliseconds()
+  );
+}
+function localRangeUTC_RAY(startDateStr, endDateStr){
+  const startUTC = new Date(`${startDateStr}T00:00:00-03:00`).getTime();
+  const endUTC   = new Date(`${endDateStr}T23:59:59-03:00`).getTime();
+  return { startUTC, endUTC };
+}
+function fmtYMD(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const da= String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${da}`;
+}
+function download(filename,text){
+  const a = document.createElement("a");
+  const url = URL.createObjectURL(new Blob([text], { type:"text/csv;charset=utf-8" }));
+  a.href = url;
+  a.download = filename;
+
+  // garante gesto do usuário e evita bloqueios/condições de corrida
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  // revoga depois (evita “sumir” o download / falhar em cliques subsequentes)
+  setTimeout(()=> URL.revokeObjectURL(url), 1500);
+}
+function toCsv(rows){
+  // separador ; e BOM
+  const csv = rows.map(r => r.map(v => {
+    const s = String(v ?? '');
+    return /[;"\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s;
+  }).join(';')).join('\n');
+  return '\uFEFF' + csv;
+}
+
+/* ======= Leitura da planilha (mesma lógica do Workspace) ======= */
+async function loadClientMap(){
+  if (CLIENTS_MAP && CLIENTS_INFO) return CLIENTS_MAP;
+
+  CLIENTS_MAP  = new Map();
+  CLIENTS_INFO = new Map();
+
+  // 1) Tenta Sheets API (se houver API KEY)
+  if (GOOGLE_SHEET_ID && GOOGLE_API_KEY){
+    try{
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(GOOGLE_SHEET_ID)}/values/${encodeURIComponent(GOOGLE_SHEET_RANGE)}?key=${encodeURIComponent(GOOGLE_API_KEY)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Sheets API HTTP ' + res.status);
+      const json = await res.json();
+      const values = Array.isArray(json.values) ? json.values : [];
+
+      // Parsing robusto (estilo Workspace): detecta colunas por header quando existir
+      const vals = values;
+
+      const normH = (s)=> String(s||'')
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'')
+        .replace(/[^a-z0-9_ ]/g,'')
+        .replace(/\s+/g,' ');
+
+      const header = Array.isArray(vals[0]) ? vals[0] : [];
+      const h = header.map(normH);
+
+      const findIdx = (cands)=>{
+        for (const c of cands){
+          const cc = normH(c);
+          const idx = h.findIndex(x => x === cc || x.includes(cc));
+          if (idx !== -1) return idx;
+        }
+        return -1;
+      };
+
+      let iCode = findIdx(['codigo', 'codigo cliente', 'codigo do cliente', 'cod', 'id']);
+      let iName = findIdx(['nome', 'nome cliente', 'nome do cliente', 'razao social', 'razão social', 'cliente']);
+      let iUnit = findIdx(['unidade', 'unidade de negocio', 'unidade de negócio', 'unidade_negocio', 'unidadenegocio']);
+
+      // fallback padrão A:B:C
+      if (iCode === -1) iCode = 0;
+      if (iName === -1) iName = 1;
+      if (iUnit === -1) iUnit = 2;
+
+      // começa do 1 se há header “provável”; senão varre tudo
+      let start = 0;
+      if (h.length && (h.some(x=>x.includes('codigo')) || h.some(x=>x.includes('nome')))) start = 1;
+
+      for (let i=start;i<vals.length;i++){
+        const row = vals[i];
+        if (!row || row.length < 2) continue;
+
+        const codeRaw = String(row[iCode] ?? '').trim();
+        const name    = String(row[iName] ?? '').trim();
+        const unidade = String(row[iUnit] ?? '').trim();
+
+        const code = normCode(codeRaw);
+        if (!code) continue;
+
+        CLIENTS_MAP.set(codeRaw, name);
+        CLIENTS_MAP.set(code, name);
+
+        CLIENTS_INFO.set(codeRaw, { name, unidade });
+        CLIENTS_INFO.set(code,    { name, unidade });
+      }
+      return CLIENTS_MAP;
+    }catch(e){
+      console.warn('Falha ao carregar clientes (Sheets API):', e);
+      // cai para fallback
+    }
+  }
+
+  // 2) Fallback Apps Script (se configurado)
+  if (CLIENTS_API_URL){
+    try{
+      const res = await fetch(CLIENTS_API_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('Apps Script HTTP ' + res.status);
+      const json = await res.json();
+      const list = (json && Array.isArray(json.clientes)) ? json.clientes : [];
+      for (const it of list){
+        const codeRaw = String(it.codigo||'').trim();
+        const name    = String(it.nome||'').trim();
+        const unidade = String(it.unidade||'').trim();
+        const code = normCode(codeRaw);
+        if (!code) continue;
+
+        CLIENTS_MAP.set(codeRaw, name);
+        CLIENTS_MAP.set(code, name);
+
+        CLIENTS_INFO.set(codeRaw, { name, unidade });
+        CLIENTS_INFO.set(code,    { name, unidade });
+      }
+      return CLIENTS_MAP;
+    }catch(e){
+      console.warn('Falha ao carregar clientes (Apps Script):', e);
+    }
+  }
+
+  // 3) Sem dados
+  return CLIENTS_MAP;
+}
+
+/* ======= Merge de arquivos ======= */
+function mergeFilesForUnified(files){
+  if (!files.length) return null;
+
+  let startMin = null;
+  let endMax   = null;
+  let conversations = [];
+
+  for (const f of files){
+    const d = f.data || {};
+    const s = String(d.startDateStr || '').trim();
+    const e = String(d.endDateStr || '').trim();
+    if (s && (!startMin || s < startMin)) startMin = s;
+    if (e && (!endMax   || e > endMax))   endMax   = e;
+
+    if (Array.isArray(d.conversations)) conversations = conversations.concat(d.conversations);
+  }
+
+  if (!startMin || !endMax) return null;
+  return { startDateStr: startMin, endDateStr: endMax, conversations };
+}
+
+/* ======= Core: agregação por cliente e totais ======= */
+function computeAggregates(data){
+  const { startDateStr, endDateStr, conversations } = data;
+  const { startUTC, endUTC } = localRangeUTC_RAY(startDateStr, endDateStr);
+
+  const UNID_PREFIX = 'CLIENTE_NI_';
+
+  const counts      = new Map(); // codeKey -> interacoes
+  const firstTime   = new Map(); // codeKey -> ms (UTC base, representando local)
+  const lastTime    = new Map(); // codeKey -> ms
+  const convTouched = new Set(); // conv idx (ou referência) com >=1 interação válida
+
+  const identifiedCodes   = new Set();
+  const unidentifiedCodes = new Set();
+
+  const dayInteractions = new Map(); // YYYY-MM-DD -> qty
+  const dayConversations = new Map(); // YYYY-MM-DD -> Set(codeKey+convIndex) size
+
+  // para não armazenar Sets gigantes: usamos um Map dia->Set de chaves
+  const dayConvSets = new Map();
+
+  for (let cIdx=0; cIdx<conversations.length; cIdx++){
+    const conv = conversations[cIdx];
+    const uid = conv?.user_id || conv?.anonymous_id || '';
+    const rawCode = parseUserIdPart(uid);
+    const codeNorm = normCode(rawCode);
+
+    const isUnidentified = !codeNorm;
+    const codeKey = isUnidentified ? (UNID_PREFIX + String(cIdx+1)) : codeNorm;
+
+    const msgs = Array.isArray(conv?.messages) ? conv.messages : [];
+    let validPairs = 0;
+
+    for (let i=0;i<msgs.length;i++){
+      const m = msgs[i];
+      if (!m || m.role !== 'user' || !m.createdAt) continue;
+
+      const t = createdAtLocalEpoch_RAY(m.createdAt);
+      if (isNaN(t) || t < startUTC || t > endUTC) continue;
+
+      const next = msgs[i+1];
+      if (!next || next.role !== 'assistant') continue;
+
+      const hasScore = (next.score != null) || JSON.stringify(next.content || "").includes('"score"');
+      if (!hasScore) continue;
+
+      validPairs++;
+      // first/last
+      const ft = firstTime.get(codeKey);
+      const lt = lastTime.get(codeKey);
+      if (ft == null || t < ft) firstTime.set(codeKey, t);
+      if (lt == null || t > lt) lastTime.set(codeKey, t);
+
+      // por dia
+      const d = new Date(t);
+      const day = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+      dayInteractions.set(day, (dayInteractions.get(day)||0) + 1);
+
+      if (!dayConvSets.has(day)) dayConvSets.set(day, new Set());
+      dayConvSets.get(day).add(`${codeKey}#${cIdx}`);
+    }
+
+    if (validPairs > 0){
+      counts.set(codeKey, (counts.get(codeKey)||0) + validPairs);
+      convTouched.add(cIdx);
+
+      if (isUnidentified) unidentifiedCodes.add(codeKey);
+      else identifiedCodes.add(codeKey);
+    }
+  }
+
+  for (const [day,set] of dayConvSets.entries()){
+    dayConversations.set(day, set.size);
+  }
+
+  // totais
+  let totalInteractions = 0;
+  for (const v of counts.values()) totalInteractions += v;
+
+  return {
+    startDateStr, endDateStr,
+    counts, firstTime, lastTime,
+    identifiedCodes, unidentifiedCodes,
+    totalInteractions,
+    totalConversations: convTouched.size,
+    dayInteractions, dayConversations
+  };
+}
+
+function fmtDMY(s){
+  // s esperado: "YYYY-MM-DD" -> "dd/mm/aaaa"
+  const t = String(s||'').trim();
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(t);
+  if (!m) return t || '—';
+  return `${m[3]}/${m[2]}/${m[1]}`;
+}
+
+function renderFileList(){
+  const ul = document.getElementById('fileList');
+  if (!ul) return;
+
+  if (!RAY_FILES.length){
+    ul.innerHTML = `<li class="muted">Nenhum arquivo importado.</li>`;
+    return;
+  }
+
+  ul.innerHTML = RAY_FILES.map(f=>{
+    const bot = String(f?.data?.chatbotName || 'Bot').trim();
+    const start = fmtDMY(f?.data?.startDateStr);
+    const end   = fmtDMY(f?.data?.endDateStr);
+
+    // Ex: Holos - Dashboard — 01/02/2026 a 28/02/2026
+    const line = `${escapeHtml(bot)} — ${escapeHtml(start)} a ${escapeHtml(end)}`;
+    const fname = escapeHtml(String(f?.name || ''));
+
+    return `
+      <li class="file-item">
+        <div>
+          <div class="title">${line}</div>
+          <div class="meta">${fname}</div>
+        </div>
+      </li>
+    `;
+  }).join('');
+}
+
+function renderTotalsUI(agg){
+  document.getElementById('periodLabel').textContent =
+    `Período: ${agg.startDateStr} – ${agg.endDateStr}`;
+
+  const identified = agg.identifiedCodes.size;
+  const distinct = identified + agg.unidentifiedCodes.size;
+
+  const elIdent = document.getElementById('totalsClientsIdentified');
+  if (elIdent) elIdent.textContent = String(identified);
+
+  document.getElementById('totalsClientsDistinct').textContent = String(distinct);
+  document.getElementById('totalsClientsUnidentified').textContent = String(agg.unidentifiedCodes.size);
+  document.getElementById('totalsConversations').textContent = String(agg.totalConversations);
+  document.getElementById('totalsInteractions').textContent = String(agg.totalInteractions);
+
+  const top5 = (m) => Array.from(m.entries())
+    .sort((a,b)=> b[1]-a[1] || String(a[0]).localeCompare(String(b[0]),'pt-BR'))
+    .slice(0,5);
+
+  const liInter = top5(agg.dayInteractions).map(([day,qty])=>{
+    return `<li>${escapeHtml(day)} — <b>${qty}</b></li>`;
+  }).join('') || `<li class="muted">—</li>`;
+
+  const liConv = top5(agg.dayConversations).map(([day,qty])=>{
+    return `<li>${escapeHtml(day)} — <b>${qty}</b></li>`;
+  }).join('') || `<li class="muted">—</li>`;
+
+  document.getElementById('topDaysInteractions').innerHTML = liInter;
+  document.getElementById('topDaysConversations').innerHTML = liConv;
+}
+
+/* ======= Importação ======= */
+document.getElementById("fileInput").addEventListener("change", async (e)=>{
+  overlay.style.display="flex";
+  overlayText.innerText="Carregando arquivos...";
+
+  try{
+    RAY_FILES = [];
+    const files = Array.from(e.target.files || []);
+    for (const file of files){
+  const text = await file.text();
+  const data = JSON.parse(text);
+
+  // Preserva o nome do bot por conversa (para relatórios e “Sistema”)
+  const botName = String(data?.chatbotName || '').trim();
+  if (Array.isArray(data?.conversations) && botName){
+    for (const conv of data.conversations){
+      if (conv && !conv.__botName) conv.__botName = botName;
+    }
+  }
+
+  RAY_FILES.push({ name:file.name, data });
+}
+
+    document.getElementById("fileName").innerText =
+  RAY_FILES.length ? `${RAY_FILES.length} arquivo(s)` : "0 arquivos";
+
+    renderFileList();
+
+    __RAY_MERGED = mergeFilesForUnified(RAY_FILES);
+    if (!__RAY_MERGED){
+      overlay.style.display="none";
+      alert("Não foi possível identificar startDateStr/endDateStr nos JSONs.");
+      return;
+    }
+
+    // carrega clientes (para ficar pronto pros relatórios e para manter mesma lógica do Workspace)
+    await loadClientMap();
+
+    // calcula e renderiza os totais na tela
+    const agg = computeAggregates(__RAY_MERGED);
+    renderTotalsUI(agg);
+
+    overlay.style.display="none";
+  }catch(err){
+    console.error(err);
+    overlay.style.display="none";
+    alert("Erro ao importar/processar os arquivos. Verifique o console.");
+  }
+});
+
+/* ======= EXPORTS (3 relatórios) ======= */
+async function exportUnified(){
+  if(!RAY_FILES.length || !__RAY_MERGED) return alert("Importe arquivos primeiro");
+
+  overlay.style.display="flex";
+  overlayText.innerText="Gerando Relatório Unificado...";
+
+  try{
+    const map = await loadClientMap();
+    const agg = computeAggregates(__RAY_MERGED);
+
+    const INTERNAL = INTERNAL_LICENSE_CODES;
+    const UNID_PREFIX = 'CLIENTE_NI_';
+
+    const rows = [[
+      'Codigo',
+      'Cliente',
+      'Unidade de Negócio',
+      'Interacoes',
+      'Data',
+      'Hora Primeira Interação',
+      'Hora da Última Interação',
+      'Clientes Distintos Identificados',
+      'Clientes Não Identificados'
+    ]];
+
+    const dateLabel = (agg.startDateStr === agg.endDateStr)
+      ? agg.startDateStr
+      : (agg.startDateStr + ' – ' + agg.endDateStr);
+
+    const hhmmss = (ms) => {
+      const d = new Date(ms);
+      const hh = String(d.getUTCHours()).padStart(2,'0');
+      const mm = String(d.getUTCMinutes()).padStart(2,'0');
+      const ss = String(d.getUTCSeconds()).padStart(2,'0');
+      return `${hh}:${mm}:${ss}`;
+    };
+
+    let first = true;
+    Array.from(agg.counts.entries())
+      .sort(([a],[b]) => String(a).localeCompare(String(b),'pt-BR'))
+      .forEach(([codeKey, qty])=>{
+        const isNI = String(codeKey).startsWith(UNID_PREFIX);
+
+        let name = '';
+        let unit = '';
+
+        if (isNI){
+          const n = Number(String(codeKey).slice(UNID_PREFIX.length)) || 0;
+          name = `Cliente não identificado ${n || ''}`.trim();
+        } else {
+          const info = (CLIENTS_INFO && (CLIENTS_INFO.get(codeKey) || CLIENTS_INFO.get(normCode(codeKey)))) || null;
+          name = info?.name || (map.get(codeKey) || map.get(normCode(codeKey)) || '');
+          unit = info?.unidade ? String(info.unidade) : '';
+          if (codeKey && INTERNAL.has(codeKey)) name = 'Licença Interna';
+        }
+
+        const f = agg.firstTime.get(codeKey);
+        const l = agg.lastTime.get(codeKey);
+
+        rows.push([
+          isNI ? '' : codeKey,
+          name,
+          unit,
+          String(qty),
+          dateLabel,
+          f != null ? hhmmss(f) : '',
+          l != null ? hhmmss(l) : '',
+          first ? String(agg.identifiedCodes.size) : '',
+          first ? String(agg.unidentifiedCodes.size) : ''
+        ]);
+
+        first = false;
+      });
+
+    if (rows.length === 1){
+      overlay.style.display="none";
+      alert("Nenhuma interação válida no período.");
+      return;
+    }
+
+    const fname = `ray_unificado_${agg.startDateStr.replace(/-/g,'')}_${agg.endDateStr.replace(/-/g,'')}.csv`;
+    download(fname, toCsv(rows));
+    overlay.style.display="none";
+  }catch(err){
+    console.error(err);
+    overlay.style.display="none";
+    alert("Ocorreu um erro ao gerar o Relatório Unificado.");
+  }
+}
+
+async function exportSeparate(){
+  if(!RAY_FILES.length) return alert("Importe arquivos primeiro");
+
+  overlay.style.display="flex";
+  overlayText.innerText="Gerando Relatórios Separados...";
+
+  try{
+    const map = await loadClientMap();
+    const INTERNAL = INTERNAL_LICENSE_CODES;
+    const UNID_PREFIX = 'CLIENTE_NI_';
+
+    for (const f of RAY_FILES){
+      const data = f.data;
+      if (!data || !data.startDateStr || !data.endDateStr || !Array.isArray(data.conversations)) continue;
+
+      const merged = { startDateStr: data.startDateStr, endDateStr: data.endDateStr, conversations: data.conversations };
+      const agg = computeAggregates(merged);
+
+      const rows = [[
+        'Codigo',
+        'Cliente',
+        'Unidade de Negócio',
+        'Interacoes',
+        'Data',
+        'Hora Primeira Interação',
+        'Hora da Última Interação',
+        'Clientes Distintos Identificados',
+        'Clientes Não Identificados'
+      ]];
+
+      const dateLabel = (agg.startDateStr === agg.endDateStr)
+        ? agg.startDateStr
+        : (agg.startDateStr + ' – ' + agg.endDateStr);
+
+      const hhmmss = (ms) => {
+        const d = new Date(ms);
+        const hh = String(d.getUTCHours()).padStart(2,'0');
+        const mm = String(d.getUTCMinutes()).padStart(2,'0');
+        const ss = String(d.getUTCSeconds()).padStart(2,'0');
+        return `${hh}:${mm}:${ss}`;
+      };
+
+      let first = true;
+      Array.from(agg.counts.entries())
+        .sort(([a],[b]) => String(a).localeCompare(String(b),'pt-BR'))
+        .forEach(([codeKey, qty])=>{
+          const isNI = String(codeKey).startsWith(UNID_PREFIX);
+
+          let name = '';
+          let unit = '';
+
+          if (isNI){
+            const n = Number(String(codeKey).slice(UNID_PREFIX.length)) || 0;
+            name = `Cliente não identificado ${n || ''}`.trim();
+          } else {
+            const info = (CLIENTS_INFO && (CLIENTS_INFO.get(codeKey) || CLIENTS_INFO.get(normCode(codeKey)))) || null;
+            name = info?.name || (map.get(codeKey) || map.get(normCode(codeKey)) || '');
+            unit = info?.unidade ? String(info.unidade) : '';
+            if (codeKey && INTERNAL.has(codeKey)) name = 'Licença Interna';
+          }
+
+          const ft = agg.firstTime.get(codeKey);
+          const lt = agg.lastTime.get(codeKey);
+
+          rows.push([
+            isNI ? '' : codeKey,
+            name,
+            unit,
+            String(qty),
+            dateLabel,
+            ft != null ? hhmmss(ft) : '',
+            lt != null ? hhmmss(lt) : '',
+            first ? String(agg.identifiedCodes.size) : '',
+            first ? String(agg.unidentifiedCodes.size) : ''
+          ]);
+          first = false;
+        });
+
+      const baseName = String(f.name||'relatorio').replace(/\.json$/i,'');
+      const outName = `${baseName}.csv`;
+      download(outName, toCsv(rows));
+    }
+
+    overlay.style.display="none";
+  }catch(err){
+    console.error(err);
+    overlay.style.display="none";
+    alert("Ocorreu um erro ao gerar os relatórios separados.");
+  }
+}
+
+async function exportDetailed(){
+  if(!RAY_FILES.length || !__RAY_MERGED) return alert("Importe arquivos primeiro");
+
+  // bloqueio de reentrada (evita cliques repetidos durante geração)
+  if (exportDetailed.__busy) return;
+  exportDetailed.__busy = true;
+
+  overlay.style.display="flex";
+  overlayText.innerText="Gerando Relatório Detalhado...";
+
+  try{
+    const map = await loadClientMap();
+    const { startDateStr, endDateStr, conversations } = __RAY_MERGED;
+    const { startUTC, endUTC } = localRangeUTC_RAY(startDateStr, endDateStr);
+
+    // Cabeçalho exatamente como no Workspace/print
+    const rows = [[
+      'Codigo do Cliente',
+      'Nome do Cliente',
+      'Data (dd/mm/aaaa — horário local UTC−3)',
+      'Hora (hh:mm — horário local UTC−3)',
+      'Sistema'
+    ]];
+
+    for (let cIdx=0; cIdx<conversations.length; cIdx++){
+      const conv = conversations[cIdx];
+      const uid = conv?.user_id || conv?.anonymous_id || '';
+      const rawCode = parseUserIdPart(uid);
+      const codeNorm = normCode(rawCode);
+      const isNI = !codeNorm;
+
+      const msgs = Array.isArray(conv?.messages) ? conv.messages : [];
+      for (let i=0;i<msgs.length;i++){
+        const m = msgs[i];
+        if (!m || String(m.role).toLowerCase() !== 'user' || !m.createdAt) continue;
+
+        const t = createdAtLocalEpoch_RAY(m.createdAt);
+        if (isNaN(t) || t < startUTC || t > endUTC) continue;
+
+        // Regra igual ao Workspace: procura o primeiro assistant após o user (antes de outro user)
+        let ok = false;
+        for (let j=i+1; j<msgs.length; j++){
+          const a = msgs[j];
+          const r = String(a?.role||'').toLowerCase();
+          if (r === 'assistant'){
+            ok = (a?.score != null) || JSON.stringify(a?.content || "").includes('"score"');
+            break;
+          }
+          if (r === 'user') break;
+        }
+        if (!ok) continue;
+
+        const d = new Date(t);
+        const dateStr = `${String(d.getUTCDate()).padStart(2,'0')}/${String(d.getUTCMonth()+1).padStart(2,'0')}/${d.getUTCFullYear()}`;
+        const timeStr = `${String(d.getUTCHours()).padStart(2,'0')}:${String(d.getUTCMinutes()).padStart(2,'0')}`; // hh:mm (sem segundos)
+
+        // Nome do cliente via planilha (quando houver)
+        let name = '';
+        if (isNI){
+          name = 'Cliente não identificado';
+        } else {
+          const info = (CLIENTS_INFO && (CLIENTS_INFO.get(codeNorm) || CLIENTS_INFO.get(normCode(codeNorm)))) || null;
+          name = info?.name || (map.get(codeNorm) || map.get(normCode(codeNorm)) || '');
+          if (codeNorm && INTERNAL_LICENSE_CODES.has(codeNorm)) name = 'Licença Interna';
+        }
+
+        // Sistema: prioriza bot “carregado” no conversation (tag) e fallback para o conv/chatbotName
+        const sistema = String(conv?.__botName || conv?.chatbotName || __RAY_MERGED?.chatbotName || '');
+
+        rows.push([
+          isNI ? '' : codeNorm,
+          name,
+          dateStr,
+          timeStr,
+          sistema
+        ]);
+      }
+    }
+
+    if (rows.length === 1){
+      alert("Nenhuma interação válida no período.");
+      return;
+    }
+
+    const fname = `ray_detalhado_${startDateStr.replace(/-/g,'')}_${endDateStr.replace(/-/g,'')}.csv`;
+    download(fname, toCsv(rows));
+  }catch(err){
+    console.error(err);
+    alert("Ocorreu um erro ao gerar o Relatório Detalhado.");
+  }finally{
+    overlay.style.display="none";
+    exportDetailed.__busy = false;
+  }
+}
+</script>
+</body>
+</html>
